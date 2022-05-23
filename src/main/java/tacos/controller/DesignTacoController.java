@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.validation.Valid;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -23,6 +26,7 @@ import tacos.model.Ingredient.Type;
 @RequestMapping("/design")
 public class DesignTacoController {
 	private RestTemplate rest = new RestTemplate();
+	public static List<Long> tacoIds = new ArrayList<>();
 	
 	@ModelAttribute
 	public void addIngredientsToModel(Model model) {
@@ -45,9 +49,11 @@ public class DesignTacoController {
 		if (errors.hasErrors()) {
 			return "design";
 		}
-		// Save the taco design...
-		// We'll do this in later
+	
 		log.info("Processing design: " + taco);
+		HttpEntity<Taco> request = new HttpEntity<>(taco);
+		ResponseEntity<Long> res = rest.postForEntity("http://localhost:8080/design", request, Long.class);
+		tacoIds.add(res.getBody());
 		return "redirect:/orders/current";
 	}
 
